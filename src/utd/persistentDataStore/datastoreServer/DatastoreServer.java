@@ -18,7 +18,7 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import utd.persistentDataStore.datastoreServer.commands.ServerCommand;
+import utd.persistentDataStore.datastoreServer.commands.*;
 import utd.persistentDataStore.utils.ServerException;
 import utd.persistentDataStore.utils.StreamUtil;
 
@@ -70,7 +70,33 @@ public class DatastoreServer
 	private ServerCommand dispatchCommand(InputStream inputStream) throws ServerException
 	{
 		// Need to implement
-		return null;
+		String command = null;
+		ServerCommand serverCommand = null;
+		
+		try {
+			command = StreamUtil.readLine(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new ServerException("Unable to process command.");
+		}
+		
+		if("write".equalsIgnoreCase(command)) {
+			serverCommand = new WriteCommand();
+		} 
+		else if("read".equalsIgnoreCase(command)) {
+			serverCommand = new ReadCommand();
+		}
+		else if("delete".equalsIgnoreCase(command)) {
+			serverCommand = new DeleteCommand();
+		}
+		else if("directory".equalsIgnoreCase(command)) {
+			serverCommand = new DirectoryCommand();
+		}
+		else {
+			throw new ServerException("Command not found.");
+		}
+		
+		return serverCommand;
 	}
 
 	public static void main(String args[])
