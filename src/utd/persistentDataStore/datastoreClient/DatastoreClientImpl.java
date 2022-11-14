@@ -11,6 +11,7 @@
  
 package utd.persistentDataStore.datastoreClient;
 
+//Imports
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,11 +24,15 @@ import java.util.List;
 
 import utd.persistentDataStore.utils.StreamUtil;
 
+//Class to implement the client API
 public class DatastoreClientImpl implements DatastoreClient
 {
+	//Declare InetAddress and port
 	private InetAddress address;
 	private int port;
 
+	//Constructor
+	//Instantiate address and port
 	public DatastoreClientImpl(InetAddress address, int port)
 	{
 		this.address = address;
@@ -37,10 +42,12 @@ public class DatastoreClientImpl implements DatastoreClient
 	/* (non-Javadoc)
 	 * @see utd.persistentDataStore.datastoreClient.DatastoreClient#write(java.lang.String, byte[])
 	 */
+	//Override write function in DatastoreClient interface.
 	@Override
     public void write(String name, byte data[]) throws ClientException, ConnectionException
 	{
 		try {
+			//Initiate socket, SocketAddress, Input and Output streams
 			//System.out.println("Opening Socket");
 			Socket socket = new Socket();
 			SocketAddress saddr = new InetSocketAddress(address, port);
@@ -48,12 +55,14 @@ public class DatastoreClientImpl implements DatastoreClient
 			InputStream inputStream = socket.getInputStream();
 			OutputStream outputStream = socket.getOutputStream();
 			
-			
+			//Send write command with name, length and data.
 			StreamUtil.writeLine("write\n", outputStream);
 			StreamUtil.writeLine(name, outputStream);
 			StreamUtil.writeLine(data.length + "\n", outputStream);
 			StreamUtil.writeData(data, outputStream);
 			
+			//Read response from server. Return OK response if success; otherwise return error message.
+			//Close streams and socket where appropriate.
 			String response = StreamUtil.readLine(inputStream);
 			if(response.contentEquals("OK"))
 			{
@@ -78,10 +87,12 @@ public class DatastoreClientImpl implements DatastoreClient
 	/* (non-Javadoc)
 	 * @see utd.persistentDataStore.datastoreClient.DatastoreClient#read(java.lang.String)
 	 */
+	//Override read function in DatastoreClient interface.
 	@Override
     public byte[] read(String name) throws ClientException, ConnectionException
 	{
 		try {
+			//Initiate socket, SocketAddress, Input and Output streams
 			//System.out.println("Opening Socket");
 			Socket socket = new Socket();
 			SocketAddress saddr = new InetSocketAddress(address, port);
@@ -89,10 +100,13 @@ public class DatastoreClientImpl implements DatastoreClient
 			InputStream inputStream = socket.getInputStream();
 			OutputStream outputStream = socket.getOutputStream();
 			
+			//Write read command and name of data to read
 			//System.out.println("Writing Message");
 			StreamUtil.writeLine("read\n", outputStream);
 			StreamUtil.writeLine(name, outputStream);
 			
+			//Read response from server. Return OK response if success; otherwise return error message.
+			//Close streams and socket where appropriate.
 			String response = StreamUtil.readLine(inputStream);
 			if (!response.contentEquals("OK")) 
 			{
@@ -102,6 +116,7 @@ public class DatastoreClientImpl implements DatastoreClient
 			}
 			else 
 			{
+				//Use response parameters to read and return data
 				int size = Integer.parseInt(StreamUtil.readLine(inputStream));
 				
 				byte[] data = new byte[size];
@@ -127,20 +142,24 @@ public class DatastoreClientImpl implements DatastoreClient
 	/* (non-Javadoc)
 	 * @see utd.persistentDataStore.datastoreClient.DatastoreClient#delete(java.lang.String)
 	 */
+	//Override delete function in DatastoreClient interface.
 	@Override
     public void delete(String name) throws ClientException, ConnectionException
 	{
 		try {
+			//Initiate socket, SocketAddress, Input and Output streams
 			Socket socket = new Socket();
 			SocketAddress saddr = new InetSocketAddress(address, port);
 			socket.connect(saddr);
 			InputStream inputStream = socket.getInputStream();
 			OutputStream outputStream = socket.getOutputStream();
 			
-			
+			//Send delete command and name of data to delete
 			StreamUtil.writeLine("delete\n", outputStream);
 			StreamUtil.writeLine(name, outputStream);
 			
+			//Read response from server. Return OK response if success; otherwise return error message.
+			//Close streams and socket where appropriate.
 			String response = StreamUtil.readLine(inputStream);
 			if(response.contentEquals("OK"))
 			{
@@ -170,23 +189,27 @@ public class DatastoreClientImpl implements DatastoreClient
 	/* (non-Javadoc)
 	 * @see utd.persistentDataStore.datastoreClient.DatastoreClient#directory()
 	 */
+	//Override directory function in DatastoreClient interface.
 	@Override
     public List<String> directory() throws ClientException, ConnectionException
 	{
 		try {
+			//Initiate socket, SocketAddress, Input and Output streams
 			Socket socket = new Socket();
 			SocketAddress saddr = new InetSocketAddress(address, port);
 			socket.connect(saddr);
 			InputStream inputStream = socket.getInputStream();
 			OutputStream outputStream = socket.getOutputStream();
 			
-			
+			//Send directory command
 			StreamUtil.writeLine("directory\n", outputStream);
 			
-			
+			//Read response from server. Return OK response if success; otherwise return error message.
+			//Close streams and socket where appropriate.
 			String response = StreamUtil.readLine(inputStream);
 			if(response.contentEquals("OK"))
 			{
+				//Use response to load and return directory
 				System.out.print(response + "\n");
 				int size = Integer.parseInt(StreamUtil.readLine(inputStream));
 				System.out.print(size + "\n");
