@@ -11,7 +11,7 @@
  
 package utd.persistentDataStore.datastoreServer;
 
-
+//Imports
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -22,6 +22,8 @@ import utd.persistentDataStore.datastoreServer.commands.*;
 import utd.persistentDataStore.utils.ServerException;
 import utd.persistentDataStore.utils.StreamUtil;
 
+//Server class
+//Opens a local port to 10023 and listens for incoming requests from client API
 public class DatastoreServer
 {
 	static public final int port = 10023;
@@ -29,11 +31,13 @@ public class DatastoreServer
 	public void startup() throws IOException
 	{
 		System.out.println("Starting Service at port " + port);
-
+		//Initiate socket
 		ServerSocket serverSocket = new ServerSocket(port);
-
+		
+		//Declare input and output streams
 		InputStream inputStream = null;
 		OutputStream outputStream = null;
+		//Infinite loop used to listen for incoming requests.
 		while (true) {
 			try {
 				System.out.println("Waiting for request");
@@ -41,16 +45,19 @@ public class DatastoreServer
 				// request is received at the configured port number
 				Socket clientSocket = serverSocket.accept();
 				System.out.println("Request received");
-
+				
+				//Initiate input and output streams
 				inputStream = clientSocket.getInputStream();
 				outputStream = clientSocket.getOutputStream();
-
+				
+				//Initiate server command with incoming request from client API and run command
 				ServerCommand command = dispatchCommand(inputStream);
 				System.out.println("Processing Request: " + command);
 				command.setInputStream(inputStream);
 				command.setOutputStream(outputStream);
 				command.run();
 				
+				//Close socket
 				StreamUtil.closeSocket(inputStream);
 			}
 			catch (ServerException ex) {
@@ -69,10 +76,11 @@ public class DatastoreServer
 
 	private ServerCommand dispatchCommand(InputStream inputStream) throws ServerException
 	{
-		// Need to implement
+		//Declare command and serverCommand
 		String command = null;
 		ServerCommand serverCommand = null;
 		
+		//Read in command from first line of request.
 		try {
 			command = StreamUtil.readLine(inputStream);
 		} catch (IOException e) {
@@ -80,6 +88,7 @@ public class DatastoreServer
 			throw new ServerException("Unable to process command.");
 		}
 		
+		//Instantiate serverCommand with matching request; otherwise throw error: Command not found
 		if("write".equalsIgnoreCase(command)) {
 			serverCommand = new WriteCommand();
 		} 
@@ -101,6 +110,7 @@ public class DatastoreServer
 
 	public static void main(String args[])
 	{
+		//Instantiate and run server.
 		DatastoreServer server = new DatastoreServer();
 		try {
 			server.startup();
