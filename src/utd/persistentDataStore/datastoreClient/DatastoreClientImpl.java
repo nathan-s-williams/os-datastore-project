@@ -64,6 +64,7 @@ public class DatastoreClientImpl implements DatastoreClient
 			}
 			else
 			{
+				System.out.print(response +"\n");
 				socket.close();
 				throw new IOException(response);
 			}
@@ -93,10 +94,10 @@ public class DatastoreClientImpl implements DatastoreClient
 			StreamUtil.writeLine(name, outputStream);
 			
 			String response = StreamUtil.readLine(inputStream);
-			if (!"ok".equalsIgnoreCase(response.trim())) 
+			if (!response.contentEquals("OK")) 
 			{
 				socket.close();
-				
+				System.out.print(response +"\n");
 				throw new ClientException(response);				
 			}
 			else 
@@ -107,14 +108,6 @@ public class DatastoreClientImpl implements DatastoreClient
 				
 				data = StreamUtil.readData(size, inputStream);
 				
-				System.out.print(response + "\n");
-				System.out.print(size + "\n");
-
-				for(int runner = 0; runner < size; runner++)
-				{
-					System.out.print(data[runner] + " ");
-				}
-				System.out.print("\n");
 				
 				outputStream.close();
 				inputStream.close();
@@ -158,6 +151,7 @@ public class DatastoreClientImpl implements DatastoreClient
 			}
 			else
 			{
+				System.out.print(response +"\n");
 				socket.close();
 				throw new IOException(response);
 			}
@@ -202,7 +196,6 @@ public class DatastoreClientImpl implements DatastoreClient
 				for(int runner = 0; runner < size; runner++)
 				{
 					names.add(StreamUtil.readLine(inputStream));
-					System.out.print(names.get(runner) + "\n");
 				}
 				
 				
@@ -214,6 +207,7 @@ public class DatastoreClientImpl implements DatastoreClient
 			}
 			else
 			{
+				System.out.print(response +"\n");
 				socket.close();
 				throw new IOException(response);
 			}
